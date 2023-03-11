@@ -1,0 +1,100 @@
+---
+- description: start with a clean database (drop and init)
+  method: POST
+  resource: init?drop=true
+  expect_rc: 200
+  expect_data: ""
+
+- description: wrong method should fail
+  method: GET
+  resource: init?drop=true
+  expect_rc: 405
+  expect_data:  {"detail": "Method Not Allowed"}
+
+- description: running drop/init again should work
+  method: POST
+  resource: init?drop=true
+  expect_rc: 200
+  expect_data: ""
+
+- description: running init without drop should fail
+  method: POST
+  resource: init
+  expect_rc: 500
+  expect_data: "Internal Server Error"
+
+- description: add a new user
+  method: POST
+  resource: users?name=alice
+  expect_rc: 201
+  expect_data: {"adopt_count": 0, "clams": 100, "glue_count": 0, "name": "alice", "spawn_count": 0}
+
+- description: make sure the user is there
+  method: GET
+  resource: users/alice
+  expect_rc: 200
+  expect_data: {"adopt_count": 0, "clams": 100, "glue_count": 0, "name": "alice", "spawn_count": 0}
+
+- description: add a new species
+  method: POST
+  resource: species?name=moonworm
+  expect_rc: 201
+  expect_data: {"name": "moonworm"}
+
+- description: make sure the new species is there
+  method: GET
+  resource: species/moonworm
+  expect_rc: 200
+  expect_data: {"name": "moonworm"}
+
+- description: spawn a critter
+  method: POST
+  resource: critters?username=alice&species=moonworm&name=mortimer
+  expect_rc: 201
+  critter_dt: [0]
+  expect_data:
+    last_feed_time: "2020-01-01T00:00:00"
+    last_pet_time: "2020-01-01T00:00:00"
+    last_play_time: "2020-01-01T00:00:00"
+    name: mortimer
+    spawn_time: "2020-01-01T00:00:00"
+    species: moonworm
+    username: alice
+
+- description: make sure the new critter is there
+  method: GET
+  resource: critters/alice/moonworm/mortimer
+  expect_rc: 200
+  expect_data:
+    last_feed_time: "2020-01-01T00:00:00"
+    last_pet_time: "2020-01-01T00:00:00"
+    last_play_time: "2020-01-01T00:00:00"
+    name: mortimer
+    spawn_time: "2020-01-01T00:00:00"
+    species: moonworm
+    username: alice
+
+- description: reset the database
+  method: POST
+  resource: init?drop=true
+  expect_rc: 200
+  expect_text: true
+  expect_data: ""
+
+- description: user should not be there
+  method: GET
+  resource: users/alice
+  expect_rc: 404
+  expect_data: {"detail": "user not found: name=alice"}
+
+- description: species should not be there
+  method: GET
+  resource: species/moonworm
+  expect_rc: 404
+  expect_data: {"detail": "species not found: name=moonworm"}
+
+- description: critter should not be there
+  method: GET
+  resource: critters/alice/moonworm/mortimer
+  expect_rc: 404
+  expect_data: {"detail": "critter not found: username=alice species=moonworm name=mortimer"}

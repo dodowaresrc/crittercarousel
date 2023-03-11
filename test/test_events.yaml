@@ -1,0 +1,135 @@
+---
+- description: start with a clean database (drop and init)
+  method: POST
+  resource: init?drop=true
+  expect_rc: 200
+  expect_data: ""
+  
+- description: should be 0 events
+  method: GET
+  resource: events
+  expect_rc: 200
+  expect_data: []
+
+- description: create alice
+  method: POST
+  resource: users?name=alice
+  expect_rc: 201
+  expect_data: {"adopt_count": 0, "clams": 100, "glue_count": 0, "name": "alice", "spawn_count": 0}
+
+- description: create bob
+  method: POST
+  resource: users?name=bob
+  expect_rc: 201
+  expect_data: {"adopt_count": 0, "clams": 100, "glue_count": 0, "name": "bob", "spawn_count": 0}
+
+- description: post an event for a critter that does not exist
+  method: POST
+  resource: events?username=alice&species=wombat&name=nancy&action=pet
+  event_dt: [0]
+  expect_rc: 404
+  expect_data: {"detail": "critter not found: username=alice species=wombat name=nancy"}
+
+- description: spawn a skunk for alice
+  method: POST
+  resource: critters?username=alice&species=skunk&name=sammy
+  critter_dt: [50000]
+  expect_rc: 201
+  expect_data:
+    last_feed_time: "2020-02-04T17:20:00"
+    last_pet_time: "2020-02-04T17:20:00"
+    last_play_time: "2020-02-04T17:20:00"
+    name: sammy
+    spawn_time: "2020-02-04T17:20:00"
+    species: skunk
+    username: alice
+
+- description: spawn a mole for alice
+  method: POST
+  resource: critters?username=alice&species=mole&name=maurice
+  critter_dt: [50000]
+  expect_rc: 201
+  expect_data:
+    last_feed_time: "2020-02-04T17:20:00"
+    last_pet_time: "2020-02-04T17:20:00"
+    last_play_time: "2020-02-04T17:20:00"
+    name: maurice
+    spawn_time: "2020-02-04T17:20:00"
+    species: mole
+    username: alice
+
+- description: spawn a turtle for bob
+  method: POST
+  resource: critters?username=bob&species=turtle&name=tina
+  critter_dt: [50000]
+  expect_rc: 201
+  expect_data:
+    last_feed_time: "2020-02-04T17:20:00"
+    last_pet_time: "2020-02-04T17:20:00"
+    last_play_time: "2020-02-04T17:20:00"
+    name: tina
+    spawn_time: "2020-02-04T17:20:00"
+    species: turtle
+    username: bob
+
+- description: spawn a porcupine for bob
+  method: POST
+  resource: critters?username=bob&species=porcupine&name=pam
+  critter_dt: [50000]
+  expect_rc: 201
+  expect_data:
+    last_feed_time: "2020-02-04T17:20:00"
+    last_pet_time: "2020-02-04T17:20:00"
+    last_play_time: "2020-02-04T17:20:00"
+    name: pam
+    spawn_time: "2020-02-04T17:20:00"
+    species: porcupine
+    username: bob
+
+- description: pet the porcupine
+  method: POST
+  resource: events?username=bob&species=porcupine&name=pam&action=pet
+  event_dt: [12345]
+  status_dt: [12345]
+  expect_rc: 200
+  expect_data: {"message": "pam the porcupine is not sad"}
+
+- description: feed the mole
+  method: POST
+  resource: events?username=alice&species=mole&name=maurice&action=feed
+  event_dt: [12345]
+  status_dt: [12345]
+  expect_rc: 200
+  expect_data: {"message": "maurice the mole is not hungry"}
+
+- description: play with the skunk
+  method: POST
+  resource: events?username=alice&species=skunk&name=sammy&action=play
+  event_dt: [12345]
+  status_dt: [12345]
+  expect_rc: 200
+  expect_data: {"message": "sammy the skunk is not bored"}
+
+- description: should be 3 events
+  method: GET
+  resource: events
+  expect_rc: 200
+  expect_data:
+    - action: pet
+      id: 1
+      name: pam
+      species: porcupine
+      time: "2020-01-09T13:45:00"
+      username: bob
+    - action: feed
+      id: 2
+      name: maurice
+      species: mole
+      time: "2020-01-09T13:45:00"
+      username: alice
+    - action: play
+      id: 3
+      name: sammy
+      species: skunk
+      time: "2020-01-09T13:45:00"
+      username: alice

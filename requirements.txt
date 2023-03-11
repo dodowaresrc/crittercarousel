@@ -1,0 +1,7 @@
+fastapi
+psycopg[binary]
+pydantic
+pyyaml
+unittest
+uvicorn
+xhtml
