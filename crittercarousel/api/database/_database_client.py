@@ -14,11 +14,11 @@ class DatabaseClient:
     def __init__(self):
 
         self._connstr = "postgresql://{0}:{1}@{2}:{3}/{4}".format(
-            getenv("RDS_USERNAME"),
-            getenv("RDS_PASSWORD"),
-            getenv("RDS_HOSTNAME"),
-            getenv("RDS_PORT"),
-            getenv("RDS_DB_NAME")
+            getenv("RDS_USERNAME", required=True),
+            getenv("RDS_PASSWORD", required=True),
+            getenv("RDS_HOSTNAME", required=True),
+            getenv("RDS_PORT", required=True),
+            getenv("RDS_DB_NAME", required=True)
         )
 
     @contextmanager

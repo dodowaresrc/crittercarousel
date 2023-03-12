@@ -5,7 +5,6 @@ resource aws_iam_role role {
     managed_policy_arns = [
         data.aws_iam_policy.web_tier.arn,
         data.aws_iam_policy.multi_container.arn,
-        aws_iam_policy.ecr.arn,
-        aws_iam_policy.dynamodb.arn
+        aws_iam_policy.ecr.arn
     ]
 }
