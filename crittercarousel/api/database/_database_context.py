@@ -54,9 +54,9 @@ class DatabaseContext:
             (where_eq, "="), 
             (where_ne, "!="),
             (where_gt, ">"),
-            (where_lt, ">"),
-            (where_ge, ">"),
-            (where_le, ">")
+            (where_lt, "<"),
+            (where_ge, ">="),
+            (where_le, "<=")
         ):
             if data:
                 for (key, value) in data.items():
