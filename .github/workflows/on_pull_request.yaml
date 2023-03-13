@@ -1,0 +1,9 @@
+---
+name: on pull request
+run-name: actor=${{github.actor}}
+on: pull_request
+jobs:
+  job1:
+    runs-on: python:3.10-slim-bullseye
+    steps:
+      - run: echo "go away"
