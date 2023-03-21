@@ -1,102 +1,122 @@
 [
     {
+        "namespace": "aws:autoscaling:asg",
+        "name": "MaxSize",
+        "resource": "",
+        "value": "2"
+    },
+    {
+        "namespace": "aws:autoscaling:asg",
+        "name": "MinSize",
+        "resource": "",
+        "value": "1"
+    },
+    {
         "namespace": "aws:autoscaling:launchconfiguration",
         "name": "IamInstanceProfile",
+        "resource": "",
         "value": "${instance_profile}"
     },
     {
         "namespace": "aws:autoscaling:launchconfiguration",
+        "name": "InstanceType",
+        "resource": "",
+        "value": "t3.micro"
+    },
+    {
+        "namespace": "aws:autoscaling:launchconfiguration",
         "name": "SecurityGroups",
+        "resource": "",
         "value": "${security_group}"
     },
     {
         "namespace": "aws:ec2:vpc",
         "name": "ELBScheme",
+        "resource": "",
         "value": "internet facing"
     },
     {
         "namespace": "aws:ec2:vpc",
         "name": "Subnets",
+        "resource": "",
         "value": "${subnet0},${subnet1}"
     },
     {
         "namespace": "aws:ec2:vpc",
         "name": "VPCId",
+        "resource": "",
         "value": "${vpc}"
     },
     {
         "namespace": "aws:elasticbeanstalk:application",
         "name": "Application Healthcheck URL",
+        "resource": "",
         "value": "HTTP:8888/api/v1/ping"
     },
     {
         "namespace": "aws:elasticbeanstalk:application:environment",
         "name": "APP_DEPLOYMENT",
+        "resource": "",
         "value": "${app_deployment}"
     },
     {
         "namespace": "aws:elasticbeanstalk:application:environment",
         "name": "APP_REGION",
+        "resource": "",
         "value": "${app_region}"
+    },
+    {
+        "namespace": "aws:elasticbeanstalk:application:environment",
+        "name": "RDS_HOSTNAME",
+        "resource": "",
+        "value": "${rds_hostname}"
+    },
+    {
+        "namespace": "aws:elasticbeanstalk:application:environment",
+        "name": "RDS_PORT",
+        "resource": "",
+        "value": "${rds_port}"
+    },
+    {
+        "namespace": "aws:elasticbeanstalk:application:environment",
+        "name": "RDS_DB_NAME",
+        "resource": "",
+        "value": "${rds_db_name}"
+    },
+    {
+        "namespace": "aws:elasticbeanstalk:application:environment",
+        "name": "RDS_USERNAME",
+        "resource": "",
+        "value": "${rds_username}"
+    },
+    {
+        "namespace": "aws:elasticbeanstalk:application:environment",
+        "name": "RDS_PASSWORD",
+        "resource": "",
+        "value": "${rds_password}"
     },
     {
         "namespace": "aws:elasticbeanstalk:environment",
         "name": "LoadBalancerType",
+        "resource": "",
         "value": "application"
     },
     {
         "namespace": "aws:elasticbeanstalk:environment:process:default",
         "name": "HealthCheckPath",
+        "resource": "",
         "value": "/api/v1/ping"
     },
     {
         "namespace": "aws:elasticbeanstalk:environment:process:default",
         "name": "Port",
+        "resource": "",
         "value": "8888"
     },
     {
         "namespace": "aws:elasticbeanstalk:healthreporting:system",
         "name": "SystemType",
+        "resource": "",
         "value": "enhanced"
-    },
-    {
-        "namespace": "aws:rds:dbinstance",
-        "name": "DBAllocatedStorage",
-        "value": "5"
-    },
-    {
-        "namespace": "aws:rds:dbinstance",
-        "name": "DBDeletionPolicy",
-        "value": "Delete"
-    },
-    {
-        "namespace": "aws:rds:dbinstance",
-        "name": "HasCoupledDatabase",
-        "value": "true"
-    },
-    {
-        "namespace": "aws:rds:dbinstance",
-        "name": "DBEngine",
-        "value": "postgres"
-    },
-    {
-        "namespace": "aws:rds:dbinstance",
-        "name": "DBEngineVersion",
-        "value": "14.7"
-    },
-    {
-        "namespace": "aws:rds:dbinstance",
-        "name": "DBInstanceClass",
-        "value": "db.t3.micro"
-    },
-    {
-        "namespace": "aws:rds:dbinstance",
-        "name": "DBPassword",
-        "value": "${db_password}"
-    },
-    {
-        "namespace": "aws:rds:dbinstance",
-        "name": "DBUser",
-        "value": "app"
     }
 ]

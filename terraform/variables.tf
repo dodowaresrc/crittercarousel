@@ -20,3 +20,7 @@ variable ssh_config {
     })
     default = null
 }
+
+variable user_list {
+    type = list(string)
+}

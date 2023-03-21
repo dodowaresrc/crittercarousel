@@ -1,5 +1,5 @@
 base_tags = {
-    color       = "green"
+    color       = "cyan"
     component   = "api"
     environment = "development"
     owner       = "david@dodoware.com"
@@ -14,3 +14,4 @@ ssh_config = {
     trusted_hosts   = ["24.34.67.236"]
 }
 
+user_list = ["alice", "bob"]

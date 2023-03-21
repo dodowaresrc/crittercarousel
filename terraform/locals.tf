@@ -66,12 +66,16 @@ locals {
     ebe_ssh_settings = var.ssh_config == null ? [] : [{
         namespace = "aws:autoscaling:launchconfiguration"
         name      = "EC2KeyName"
+        resource  = ""
         value     = aws_key_pair.keypair[0].id
     }]
 
     ebe_settings = concat(
-        jsondecode(data.template_file.ebe_common_settings.rendered),
-        jsondecode(data.template_file.ebe_environment_settings.rendered),
+        jsondecode(data.template_file.ebe_settings.rendered),
         local.ebe_ssh_settings
     )
+
+    cognito_path  = "/${local.deployment_name_title}/"
+
+    secret_names  = [for x in var.user_list : "${local.deployment_name}-${x}"]
 }

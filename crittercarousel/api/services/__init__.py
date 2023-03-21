@@ -8,6 +8,7 @@ from ._get_events_service import GetEventsService
 from ._get_species_service import GetSpeciesService
 from ._get_status_service import GetStatusService
 from ._get_users_service import GetUsersService
+from ._cognito_service import CognitoService
 from ._init_service import InitService
 from ._ping_service import PingService
 from ._post_event_service import PostEventService
@@ -24,6 +25,7 @@ ALL_SERVICES = (
     GetSpeciesService,
     GetStatusService,
     GetUsersService,
+    CognitoService,
     InitService,
     PingService,
     PostEventService,
@@ -41,6 +43,7 @@ __all__ = (
     GetSpeciesService.__name__,
     GetStatusService.__name__,
     GetUsersService.__name__,
+    CognitoService.__name__,
     InitService.__name__,
     PingService.__name__,
     PostEventService.__name__,

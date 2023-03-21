@@ -1,6 +1,6 @@
-resource aws_security_group sg {
+resource aws_security_group vm {
 
-    name        = local.deployment_name
+    name        = "${local.deployment_name}-vm"
     description = "trusted ssh"
     vpc_id      = aws_vpc.vpc.id
 
@@ -17,6 +17,26 @@ resource aws_security_group sg {
         to_port          = 0
         protocol         = "-1"
         cidr_blocks      = ["0.0.0.0/0"]
-        ipv6_cidr_blocks = ["::/0"]
+    }
+}
+
+resource aws_security_group db {
+    name        = "${local.deployment_name}-db"
+    description = "db access from ec2 instances"
+    vpc_id      =  aws_vpc.vpc.id
+
+    ingress {
+        from_port = 5432
+        to_port = 5432
+        protocol = "tcp"
+        cidr_blocks = [aws_subnet.subnet0.cidr_block, aws_subnet.subnet1.cidr_block]
+
+    }
+
+    egress {
+        from_port = 0
+        to_port = 0
+        protocol = "-1"
+        cidr_blocks = [aws_subnet.subnet0.cidr_block, aws_subnet.subnet1.cidr_block]
     }
 }

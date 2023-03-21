@@ -14,7 +14,8 @@ class BaseService(metaclass=abc.ABCMeta):
         router:CritterRouterInterface,
         path:str,
         methods:List[str],
-        status_code:int=status.HTTP_200_OK
+        status_code:int=status.HTTP_200_OK,
+        **kwargs
     ):
 
         self.router = router
@@ -26,7 +27,8 @@ class BaseService(metaclass=abc.ABCMeta):
             self.handle_request,
             methods=methods,
             status_code=status_code,
-            response_class=FormattedJSONResponse)
+            response_class=FormattedJSONResponse,
+            **kwargs)
 
     @abc.abstractmethod
     def handle_request(self, *args, **kwargs):

@@ -91,6 +91,7 @@
   method: GET
   resource: species/moonworm
   expect_rc: 404
+  
   expect_data: {"detail": "species not found: name=moonworm"}
 
 - description: critter should not be there
