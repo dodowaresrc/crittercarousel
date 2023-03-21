@@ -1,0 +1,90 @@
+---
+- description: start with a clean database (drop and init)
+  method: POST
+  resource: init?drop=true
+  expect_rc: 200
+  expect_data: ""
+
+- description: get list of default species
+  method: GET
+  resource: species
+  expect_rc: 200
+  expect_data:
+    - name: armadillo
+    - name: bunny
+    - name: chipmunk
+    - name: fox
+    - name: hedgehog
+    - name: iguana
+    - name: mole
+    - name: opossum
+    - name: otter
+    - name: porcupine
+    - name: skunk
+    - name: snake
+    - name: squirrel
+    - name: turtle
+    - name: weasel
+    - name: wombat
+
+- description: get fox
+  method: GET
+  resource: species?name=fox
+  expect_rc: 200
+  expect_data: [{"name": "fox"}]
+
+- description: fetch fox
+  method: GET
+  resource: species/fox
+  expect_rc: 200
+  expect_data: {"name": "fox"}
+
+- description: get otter
+  method: GET
+  resource: species?name=otter
+  expect_rc: 200
+  expect_data: [{"name": "otter"}]
+
+- description: fetch bunny
+  method: GET
+  resource: species/bunny
+  expect_rc: 200
+  expect_data: {"name": "bunny"}
+
+- description: get a species that doesn't exist yet
+  method: GET
+  resource: species?name=moonworm
+  expect_rc: 200
+  expect_list: true
+  expect_data:  []
+
+- description: fetch a species that doesn't exist yet
+  method: GET
+  resource: species/moonworm
+  expect_rc: 404
+  expect_data:  {"detail": "species not found: name=moonworm"}
+
+- description: add the new species
+  method: POST
+  resource: species?name=moonworm
+  expect_rc: 201
+  expect_data: {"name": "moonworm"}
+
+- description: get new species
+  method: GET
+  resource: species?name=moonworm
+  expect_rc: 200
+  expect_list: true
+  expect_data: [{"name": "moonworm"}]
+
+- description: fetch new species
+  method: GET
+  resource: species/moonworm
+  expect_rc: 200
+  expect_data: {"name": "moonworm"}
+
+- description: add a species that already exists
+  method: POST
+  resource: species?name=chipmunk
+  expect_rc: 409
+  expect_data: {"detail": "species already exists: chipmunk"}

@@ -1,0 +1,172 @@
+---
+- description: start with a clean database (drop and init)
+  method: POST
+  resource: init?drop=true
+  expect_rc: 200
+  expect_data: ""
+
+- description: create alice
+  method: POST
+  resource: users?name=alice
+  expect_rc: 201
+  expect_data: {"adopt_count": 0, "clams": 100, "glue_count": 0, "name": "alice", "spawn_count": 0}
+
+- description: create bob
+  method: POST
+  resource: users?name=bob
+  expect_rc: 201
+  expect_data: {"adopt_count": 0, "clams": 100, "glue_count": 0, "name": "bob", "spawn_count": 0}
+
+- description: spawn a squirrel for alice
+  method: POST
+  resource: critters?username=alice&species=squirrel&name=squeaky
+  critter_dt: [0]
+  expect_rc: 201
+  expect_data:
+    last_feed_time: "2020-01-01T00:00:00"
+    last_pet_time: "2020-01-01T00:00:00"
+    last_play_time: "2020-01-01T00:00:00"
+    name: squeaky
+    spawn_time: "2020-01-01T00:00:00"
+    species: squirrel
+    username: alice
+
+- description: spawn a chipmunk for alice
+  method: POST
+  resource: critters?username=alice&species=chipmunk&name=chauncey
+  critter_dt: [0]
+  expect_rc: 201
+  expect_text: true
+  expect_data:
+    "last_feed_time": "2020-01-01T00:00:00"
+    "last_pet_time": "2020-01-01T00:00:00"
+    "last_play_time": "2020-01-01T00:00:00"
+    "name": "chauncey"
+    "spawn_time": "2020-01-01T00:00:00"
+    "species": "chipmunk"
+    "username": "alice"
+
+- description: spawn a iguana for bob
+  method: POST
+  resource: critters?username=bob&species=iguana&name=iggy
+  critter_dt: [0]
+  expect_rc: 201
+  expect_data:
+    "last_feed_time": "2020-01-01T00:00:00"
+    "last_pet_time": "2020-01-01T00:00:00"
+    "last_play_time": "2020-01-01T00:00:00"
+    "name": "iggy"
+    "spawn_time": "2020-01-01T00:00:00"
+    "species": "iguana"
+    "username": "bob"
+
+- description: spawn an armadillo for bob
+  method: POST
+  resource: critters?username=bob&species=armadillo&name=annie
+  critter_dt: [0]
+  expect_rc: 201
+  expect_data:
+    "last_feed_time": "2020-01-01T00:00:00"
+    "last_pet_time": "2020-01-01T00:00:00"
+    "last_play_time": "2020-01-01T00:00:00"
+    "name": "annie"
+    "spawn_time": "2020-01-01T00:00:00"
+    "species": "armadillo"
+    "username": "bob"
+
+- description: spawn a chipmunk for bob
+  method: POST
+  resource: critters?username=bob&species=chipmunk&name=chauncey
+  critter_dt: [0]
+  expect_rc: 201
+  expect_text: true
+  expect_data:
+    "last_feed_time": "2020-01-01T00:00:00"
+    "last_pet_time": "2020-01-01T00:00:00"
+    "last_play_time": "2020-01-01T00:00:00"
+    "name": "chauncey"
+    "spawn_time": "2020-01-01T00:00:00"
+    "species": "chipmunk"
+    "username": "bob"
+
+- description: get squirrel status
+  method: GET
+  resource: status?username=alice&species=squirrel&name=squeaky
+  status_dt: [0]
+  expect_rc: 200
+  expect_data:
+    - boredom: 0
+      detail: squeaky the squirrel is happy
+      health: 100
+      hunger: 0
+      name: squeaky
+      sadness: 0
+      species: squirrel
+      status: happy
+      username: alice
+
+- description: get status for bob's critters
+  method: GET
+  resource: status?username=bob
+  status_dt: [0, 0, 0]
+  expect_rc: 200
+  expect_data:
+    - "boredom": 0
+      "detail": "annie the armadillo is happy"
+      "health": 100
+      "hunger": 0
+      "name": "annie"
+      "sadness": 0
+      "species": "armadillo"
+      "status": "happy"
+      "username": "bob"
+    - "boredom": 0
+      "detail": "chauncey the chipmunk is happy"
+      "health": 100
+      "hunger": 0
+      "name": "chauncey"
+      "sadness": 0
+      "species": "chipmunk"
+      "status": "happy"
+      "username": "bob"
+    - "boredom": 0
+      "detail": "iggy the iguana is happy"
+      "health": 100
+      "hunger": 0
+      "name": "iggy"
+      "sadness": 0
+      "species": "iguana"
+      "status": "happy"
+      "username": "bob"
+
+- description: get status for all chipmunks
+  method: GET
+  resource: status?species=chipmunk
+  status_dt: [0, 0]
+  expect_rc: 200
+  expect_data:
+    - "boredom": 0
+      "detail": "chauncey the chipmunk is happy"
+      "health": 100
+      "hunger": 0
+      "name": "chauncey"
+      "sadness": 0
+      "species": "chipmunk"
+      "status": "happy"
+      "username": "alice"
+    - "boredom": 0
+      "detail": "chauncey the chipmunk is happy"
+      "health": 100
+      "hunger": 0
+      "name": "chauncey"
+      "sadness": 0
+      "species": "chipmunk"
+      "status": "happy"
+      "username": "bob"
+
+- description: get status for a non-existant critter
+  method: GET
+  resource: status?username=uuu&species=sss&name=nnn
+  status_dt: [0]
+  expect_rc: 200
+  expect_data: []

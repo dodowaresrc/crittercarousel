@@ -1,0 +1,8 @@
+cryptography
+fastapi
+psycopg[binary]
+pydantic
+pyjwt
+pyyaml
+uvicorn
+httpx

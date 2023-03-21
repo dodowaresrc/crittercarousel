@@ -1,0 +1,487 @@
+---
+- description: start with a clean database (drop and init)
+  method: POST
+  resource: init?drop=true
+  expect_rc: 200
+  expect_data: ""
+
+- description: create alice
+  method: POST
+  resource: users?name=alice
+  expect_rc: 201
+  expect_data: {adopt_count: 0, clams: 100, glue_count: 0, name: alice, spawn_count: 0}
+
+- description: alice should have 100 clams
+  method: GET
+  resource: users/alice
+  expect_rc: 200
+  expect_data: {"adopt_count": 0, "clams": 100, "glue_count": 0, "name": "alice", "spawn_count": 0}
+  
+- description: create bob
+  method: POST
+  resource: users?name=bob
+  expect_rc: 201
+  expect_data: {adopt_count: 0, clams: 100, glue_count: 0, name: bob, spawn_count: 0}
+
+- description: bob should have 100 clams
+  method: GET
+  resource: users/bob
+  expect_rc: 200
+  expect_data: {"adopt_count": 0, "clams": 100, "glue_count": 0, "name": "bob", "spawn_count": 0}
+
+- description: spawn a weasel for alice at 0
+  method: POST
+  resource: critters?username=alice&species=weasel&name=wendy
+  critter_dt: [0]
+  expect_rc: 201
+  expect_data:
+    last_feed_time: "2020-01-01T00:00:00"
+    last_pet_time: "2020-01-01T00:00:00"
+    last_play_time: "2020-01-01T00:00:00"
+    name: wendy
+    spawn_time: "2020-01-01T00:00:00"
+    species: weasel
+    username: alice
+
+- description: alice should have 80 clams
+  method: GET
+  resource: users/alice
+  expect_rc: 200
+  expect_data: {"adopt_count": 0, "clams": 80, "glue_count": 0, "name": "alice", "spawn_count": 1}
+
+- description: spawn a chipmunk for bob at 2
+  method: POST
+  resource: critters?username=bob&species=chipmunk&name=chippy
+  critter_dt: [2]
+  expect_rc: 201
+  expect_data:
+    last_feed_time: "2020-01-01T00:02:00"
+    last_pet_time: "2020-01-01T00:02:00"
+    last_play_time: "2020-01-01T00:02:00"
+    name: chippy
+    spawn_time: "2020-01-01T00:02:00"
+    species: chipmunk
+    username: bob
+
+- description: bob should have 80 clams
+  method: GET
+  resource: users/bob
+  expect_rc: 200
+  expect_data: {"adopt_count": 0, "clams": 80, "glue_count": 0, "name": "bob", "spawn_count": 1}
+ 
+- description: get status at 3
+  method: GET
+  resource: status
+  status_dt: [3, 3]
+  expect_rc: 200
+  expect_data:
+   - {"boredom": 0, "detail": "wendy the weasel is happy", "health": 100, "hunger": 0, "name": "wendy", "sadness": 0, "species": "weasel", "status": "happy", "username": "alice"}
+   - {"boredom": 0, "detail": "chippy the chipmunk is happy", "health": 100, "hunger": 0, "name": "chippy", "sadness": 0, "species": "chipmunk", "status": "happy", "username": "bob"}
+
+- description: get status at 6
+  method: GET
+  resource: status
+  status_dt: [6, 6]
+  expect_rc: 200
+  expect_data:
+   - {"boredom": 1, "detail": "wendy the weasel is hungry", "health": 97, "hunger": 1, "name": "wendy", "sadness": 1, "species": "weasel", "status": "hungry", "username": "alice"}
+   - {"boredom": 0, "detail": "chippy the chipmunk is happy", "health": 100, "hunger": 0, "name": "chippy", "sadness": 0, "species": "chipmunk", "status": "happy", "username": "bob"}
+
+- description: feed the weasel at 6
+  method: POST
+  resource: events?username=alice&species=weasel&name=wendy&action=feed
+  event_dt: [6]
+  status_dt: [6]
+  expect_rc: 200
+  expect_data: {"message": "wendy the weasel is not hungry"}
+
+- description: get weasel at 6 (after feed)
+  method: GET
+  resource: critters/alice/weasel/wendy
+  expect_rc: 200
+  expect_data:
+    last_feed_time: "2020-01-01T00:06:00"
+    last_pet_time: "2020-01-01T00:00:00"
+    last_play_time: "2020-01-01T00:00:00"
+    name: wendy
+    spawn_time: "2020-01-01T00:00:00"
+    species: weasel
+    username: alice
+
+- description: get weasel status at 6 (after feed)
+  method: GET
+  resource: status?username=alice&species=weasel&name=wendy
+  expect_rc: 200
+  status_dt: [6]
+  expect_data:
+    - boredom: 1
+      detail: wendy the weasel is sad
+      health: 98
+      hunger: 0
+      name: wendy
+      sadness: 1
+      species: weasel
+      status: sad
+      username: alice
+
+- description: pet the weasel at 8
+  method: POST
+  resource: events?username=alice&species=weasel&name=wendy&action=pet
+  event_dt: [8]
+  status_dt: [8]
+  expect_rc: 200
+  expect_data: {"message": "wendy the weasel is not sad"}
+
+- description: get weasel at 8
+  method: GET
+  resource: critters/alice/weasel/wendy
+  expect_rc: 200
+  expect_data:
+    last_feed_time: "2020-01-01T00:06:00"
+    last_pet_time: "2020-01-01T00:08:00"
+    last_play_time: "2020-01-01T00:00:00"
+    name: wendy
+    spawn_time: "2020-01-01T00:00:00"
+    species: weasel
+    username: alice
+
+- description: get weasel status at 9
+  method: GET
+  resource: status?username=alice&species=weasel&name=wendy
+  expect_rc: 200
+  status_dt: [9]
+  expect_data:
+    - boredom: 6
+      detail: wendy the weasel is bored
+      health: 96
+      hunger: 0
+      name: wendy
+      sadness: 0
+      species: weasel
+      status: bored
+      username: alice
+
+- description: chipmunk gets adopted at 10 (should fail, not happy)
+  method: POST
+  resource: events?username=bob&species=chipmunk&name=chippy&action=adopt
+  event_dt: [43]
+  status_dt: [43]
+  expect_rc: 400
+  expect_data: {"detail": "chippy the chipmunk is not happy"}
+
+- description: play with the weasel at 10
+  method: POST
+  resource: events?username=alice&species=weasel&name=wendy&action=play
+  event_dt: [10]
+  status_dt: [10]
+  expect_rc: 200
+  expect_data: {"message": "wendy the weasel is not bored"}
+
+- description: get weasel status at 10
+  method: GET
+  resource: status?username=alice&species=weasel&name=wendy
+  expect_rc: 200
+  status_dt: [10]
+  expect_data:
+    - boredom: 0
+      detail: wendy the weasel is happy
+      health: 100
+      hunger: 0
+      name: wendy
+      sadness: 0
+      species: weasel
+      status: happy
+      username: alice
+
+- description: weasel gets adopted at 10 (should succeed)
+  method: POST
+  resource: events?username=alice&species=weasel&name=wendy&action=adopt
+  event_dt: [10]
+  status_dt: [10]
+  expect_rc: 200
+  expect_data: {"message": "wendy the weasel has been adopted (you get 35 clams)"}
+
+- description: wendy the weasel should no longer exist (she got adopted)
+  method: GET
+  resource: critters?username=alice&species=weasel&name=wendy
+  expect_rc: 200
+  expect_data: []
+
+- description: alice should now have 115 clams
+  method: GET
+  resource: users/alice
+  expect_rc: 200
+  expect_data: {"adopt_count": 1, "clams": 115, "glue_count": 0, "name": "alice", "spawn_count": 1}
+
+- description: get chipmunk at 20
+  method: GET
+  resource: critters/bob/chipmunk/chippy
+  expect_rc: 200
+  expect_data:
+    last_feed_time: "2020-01-01T00:02:00"
+    last_pet_time: "2020-01-01T00:02:00"
+    last_play_time: "2020-01-01T00:02:00"
+    name: chippy
+    spawn_time: "2020-01-01T00:02:00"
+    species: chipmunk
+    username: bob
+
+- description: get chipmunk status at 20
+  method: GET
+  resource: status?username=bob&species=chipmunk&name=chippy
+  expect_rc: 200
+  status_dt: [20]
+  expect_data:
+    - boredom: 21
+      detail: chippy the chipmunk is hungry
+      health: 69
+      hunger: 21
+      name: chippy
+      sadness: 21
+      species: chipmunk
+      status: hungry
+      username: bob
+
+- description: feed the chipmunk at 25
+  method: POST
+  resource: events?username=bob&species=chipmunk&name=chippy&action=feed
+  event_dt: [25]
+  status_dt: [25]
+  expect_rc: 200
+  expect_data: {"message": "chippy the chipmunk is not hungry"}
+
+- description: get chipmunk status at 30
+  method: GET
+  resource: status?username=bob&species=chipmunk&name=chippy
+  expect_rc: 200
+  status_dt: [30]
+  expect_data:
+    - boredom: 38
+      detail: chippy the chipmunk is sad
+      health: 61
+      hunger: 0
+      name: chippy
+      sadness: 38
+      species: chipmunk
+      status: sad
+      username: bob
+
+- description: pet the chipmunk at 30
+  method: POST
+  resource: events?username=bob&species=chipmunk&name=chippy&action=pet
+  event_dt: [30]
+  status_dt: [30]
+  expect_rc: 200
+  expect_data: {"message": "chippy the chipmunk is not sad"}
+
+- description: get chipmunk status at 40
+  method: GET
+  resource: status?username=bob&species=chipmunk&name=chippy
+  expect_rc: 200
+  status_dt: [40]
+  expect_data:
+    - boredom: 55
+      detail: chippy the chipmunk is bored
+      health: 58
+      hunger: 16
+      name: chippy
+      sadness: 8
+      species: chipmunk
+      status: bored
+      username: bob
+
+- description: pet the chipmunk at 41
+  method: POST
+  resource: events?username=bob&species=chipmunk&name=chippy&action=pet
+  event_dt: [41]
+  status_dt: [41]
+  expect_rc: 200
+  expect_data: {"message": "chippy the chipmunk is not sad"}
+
+- description: get chipmunk status at 41
+  method: GET
+  resource: status?username=bob&species=chipmunk&name=chippy
+  expect_rc: 200
+  status_dt: [41]
+  expect_data:
+    - boredom: 56
+      detail: chippy the chipmunk is bored
+      health: 59
+      hunger: 18
+      name: chippy
+      sadness: 0
+      species: chipmunk
+      status: bored
+      username: bob
+
+- description: feed the chipmunk at 42
+  method: POST
+  resource: events?username=bob&species=chipmunk&name=chippy&action=feed
+  event_dt: [42]
+  status_dt: [42]
+  expect_rc: 200
+  expect_data: {"message": "chippy the chipmunk is not hungry"}
+
+- description: get chipmunk status at 43
+  method: GET
+  resource: status?username=bob&species=chipmunk&name=chippy
+  expect_rc: 200
+  status_dt: [43]
+  expect_data:
+    - boredom: 60
+      detail: chippy the chipmunk is bored
+      health: 63
+      hunger: 0
+      name: chippy
+      sadness: 0
+      species: chipmunk
+      status: bored
+      username: bob
+
+- description: chipmunk gets adopted at 43 (should fail, not happy)
+  method: POST
+  resource: events?username=bob&species=chipmunk&name=chippy&action=adopt
+  event_dt: [43]
+  status_dt: [43]
+  expect_rc: 400
+  expect_data: {"detail": "chippy the chipmunk is not happy"}
+
+- description: play with the chipmunk at 43
+  method: POST
+  resource: events?username=bob&species=chipmunk&name=chippy&action=play
+  event_dt: [43]
+  status_dt: [43]
+  expect_rc: 200
+  expect_data: {"message": "chippy the chipmunk is not bored"}
+
+- description: get chipmunk status at 43
+  method: GET
+  resource: status?username=bob&species=chipmunk&name=chippy
+  expect_rc: 200
+  status_dt: [43]
+  expect_data:
+    - boredom: 0
+      detail: chippy the chipmunk is happy
+      health: 100
+      hunger: 0
+      name: chippy
+      sadness: 0
+      species: chipmunk
+      status: happy
+      username: bob
+
+- description: play with the chipmunk at 60
+  method: POST
+  resource: events?username=bob&species=chipmunk&name=chippy&action=play
+  event_dt: [60]
+  status_dt: [60]
+  expect_rc: 200
+  expect_data: {"message": "chippy the chipmunk is not bored"}
+
+- description: pet the chipmunk at 70
+  method: POST
+  resource: events?username=bob&species=chipmunk&name=chippy&action=pet
+  event_dt: [70]
+  status_dt: [70]
+  expect_rc: 200
+  expect_data: {"message": "chippy the chipmunk is not sad"}
+
+- description: get chipmunk status at 100
+  method: GET
+  resource: status?username=bob&species=chipmunk&name=chippy
+  expect_rc: 200
+  status_dt: [100]
+  expect_data:
+    - boredom: 58
+      detail: chippy the chipmunk is hungry
+      health: 16
+      hunger: 88
+      name: chippy
+      sadness: 41
+      species: chipmunk
+      status: hungry
+      username: bob
+
+- description: play with the chipmunk at 101
+  method: POST
+  resource: events?username=bob&species=chipmunk&name=chippy&action=play
+  event_dt: [101]
+  status_dt: [101]
+  expect_rc: 200
+  expect_data: {"message": "chippy the chipmunk is not bored"}
+
+- description: get chipmunk status at 120
+  method: GET
+  resource: status?username=bob&species=chipmunk&name=chippy
+  expect_rc: 200
+  status_dt: [120]
+  expect_data:
+    - boredom: 23
+      detail: chippy the chipmunk died from hunger
+      health: 0
+      hunger: 100
+      name: chippy
+      sadness: 75
+      species: chipmunk
+      status: dead
+      username: bob
+
+- description: feed the dead chipmunk at 120
+  method: POST
+  resource: events?username=bob&species=chipmunk&name=chippy&action=feed
+  event_dt: [120]
+  status_dt: [120]
+  expect_rc: 400
+  expect_data: {"detail": "chippy the chipmunk is dead"}
+
+- description: pet the dead chipmunk at 120
+  method: POST
+  resource: events?username=bob&species=chipmunk&name=chippy&action=pet
+  event_dt: [120]
+  status_dt: [120]
+  expect_rc: 400
+  expect_data: {"detail": "chippy the chipmunk is dead"}
+
+- description: play with the dead chipmunk at 120
+  method: POST
+  resource: events?username=bob&species=chipmunk&name=chippy&action=play
+  event_dt: [120]
+  status_dt: [120]
+  expect_rc: 400
+  expect_data: {"detail": "chippy the chipmunk is dead"}
+
+- description: adopt out the dead chipmunk at 120
+  method: POST
+  resource: events?username=bob&species=chipmunk&name=chippy&action=adopt
+  event_dt: [120]
+  status_dt: [120]
+  expect_rc: 400
+  expect_data: {"detail": "chippy the chipmunk is dead"}
+
+- description: do something weird with the chipmunk 120
+  method: POST
+  resource: events?username=bob&species=chipmunk&name=chippy&action=dance
+  event_dt: [120]
+  status_dt: [120]
+  expect_rc: 400
+  expect_data: {"detail": "unknown action: dance"}
+
+- description: sell the chipmunk to the glue factory at 120
+  method: POST
+  resource: events?username=bob&species=chipmunk&name=chippy&action=glue
+  event_dt: [120]
+  status_dt: [120]
+  expect_rc: 200
+  expect_data: {"message": "the glue factory gives you 2 clams for the corpse of chippy the chipmunk"}
+
+- description: bob should now have 82 clams
+  method: GET
+  resource: users/bob
+  expect_rc: 200
+  expect_data: {"adopt_count": 0, "clams": 82, "glue_count": 1, "name": "bob", "spawn_count": 1}
+
+- description: chipmunk should no longer exist
+  method: GET
+  resource: critters?username=bob&species=chipmunk&name=chippy
+  expect_rc: 200
+  expect_data: []

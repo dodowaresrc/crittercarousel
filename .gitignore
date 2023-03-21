@@ -1,0 +1,15 @@
+.coverage
+.venv
+**/__pycache__
+coverage.*
+htmlcov
+results
+.build
+.output
+.secrets
+keys
+**/.terraform.lock.hcl
+**/*openssh*
+**/terraform.tfstate
+**/terraform.tfstate.backup
+**/.terraform

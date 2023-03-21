@@ -1,0 +1,83 @@
+---
+- description: start with a clean database (drop and init)
+  method: POST
+  resource: init?drop=true
+  expect_rc: 200
+  expect_data: ""
+
+- description: user should not exist yet
+  method: GET
+  resource: users/alice
+  expect_rc: 404
+  expect_data: {"detail": "user not found: name=alice"}
+
+- description: user list should be empty
+  method: GET
+  resource: users
+  expect_rc: 200
+  checker_class: JsonListChecker
+  expect_data: []
+
+- description: create a user
+  method: POST
+  resource: users?name=alice
+  expect_rc: 201
+  expect_data: {"adopt_count": 0, "clams": 100, "glue_count": 0, "name": "alice", "spawn_count": 0}
+
+- description: user should exist
+  method: GET
+  resource: users/alice
+  expect_rc: 200
+  expect_data: {"adopt_count": 0, "clams": 100, "glue_count": 0, "name": "alice", "spawn_count": 0}
+
+- description: user list should contain one user
+  method: GET
+  resource: users
+  expect_rc: 200
+  expect_data: [{"adopt_count": 0, "clams": 100, "glue_count": 0, "name": "alice", "spawn_count": 0}]
+
+- description: filter on the user should work
+  method: GET
+  resource: users?name=alice
+  expect_rc: 200
+  checker_class: JsonListChecker
+  expect_data: [{"adopt_count": 0, "clams": 100, "glue_count": 0, "name": "alice", "spawn_count": 0}]
+
+- description: filter on a different name should return an empty list
+  method: GET
+  resource: users?name=notalice
+  expect_rc: 200
+  expect_data: []
+
+- description: create another user
+  method: POST
+  resource: users?name=bob
+  expect_rc: 201
+  expect_data: {"adopt_count": 0, "clams": 100, "glue_count": 0, "name": "bob", "spawn_count": 0}
+
+- description: user should exist
+  method: GET
+  resource: users/bob
+  expect_rc: 200
+  expect_data: {"adopt_count": 0, "clams": 100, "glue_count": 0, "name": "bob", "spawn_count": 0}
+
+- description: user list should contain two users
+  method: GET
+  resource: users
+  expect_rc: 200
+  expect_data:
+   - {"adopt_count": 0, "clams": 100, "glue_count": 0, "name": "alice", "spawn_count": 0}
+   - {"adopt_count": 0, "clams": 100, "glue_count": 0, "name": "bob", "spawn_count": 0}
+
+- description: filter on the user should work
+  method: GET
+  resource: users?name=bob
+  expect_rc: 200
+  expect_data: [{"adopt_count": 0, "clams": 100, "glue_count": 0, "name": "bob", "spawn_count": 0}]
+
+- description: filter on the first user should still work
+  method: GET
+  resource: users?name=alice
+  expect_rc: 200
+  expect_data: [{"adopt_count": 0, "clams": 100, "glue_count": 0, "name": "alice", "spawn_count": 0}]
+

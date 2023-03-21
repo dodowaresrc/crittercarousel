@@ -1,0 +1,177 @@
+---
+- description: start with a clean database (drop and init)
+  method: POST
+  resource: init?drop=true
+  expect_rc: 200
+  expect_data: ""
+
+- description: create alice
+  method: POST
+  resource: users?name=alice
+  expect_rc: 201
+  expect_data: {"adopt_count": 0, "clams": 100, "glue_count": 0, "name": "alice", "spawn_count": 0}
+
+- description: create bob
+  method: POST
+  resource: users?name=bob
+  expect_rc: 201
+  expect_data: {"adopt_count": 0, "clams": 100, "glue_count": 0, "name": "bob", "spawn_count": 0}
+
+- description: spawn oscar the opossum for alice
+  method: POST
+  resource: critters?username=alice&species=opossum&name=oscar
+  expect_rc: 201
+  critter_dt: [0]
+  expect_data:
+    last_feed_time: "2020-01-01T00:00:00"
+    last_pet_time: "2020-01-01T00:00:00"
+    last_play_time: "2020-01-01T00:00:00"
+    name: oscar
+    spawn_time: "2020-01-01T00:00:00"
+    species: opossum
+    username: alice
+  
+- description: alice should have 80 clams now
+  method: GET
+  resource: users/alice
+  expect_rc: 200
+  expect_data: {"adopt_count": 0, "clams": 80, "glue_count": 0, "name": "alice", "spawn_count": 1}
+
+- description: same species and name, different user
+  method: POST
+  resource: critters?username=bob&species=opossum&name=oscar
+  expect_rc: 201
+  critter_dt: [5]
+  expect_data:
+    last_feed_time: "2020-01-01T00:05:00"
+    last_pet_time: "2020-01-01T00:05:00"
+    last_play_time: "2020-01-01T00:05:00"
+    name: oscar
+    spawn_time: "2020-01-01T00:05:00"
+    species: opossum
+    username: bob
+
+- description: bob should have 80 clams now
+  method: GET
+  resource: users/bob
+  expect_rc: 200
+  expect_data: {"adopt_count": 0, "clams": 80, "glue_count": 0, "name": "bob", "spawn_count": 1}
+
+- description: same user and species, different name
+  method: POST
+  resource: critters?username=alice&species=opossum&name=oswald
+  expect_rc: 201
+  critter_dt: [7]
+  expect_data:
+    last_feed_time: "2020-01-01T00:07:00"
+    last_pet_time: "2020-01-01T00:07:00"
+    last_play_time: "2020-01-01T00:07:00"
+    name: oswald
+    spawn_time: "2020-01-01T00:07:00"
+    species: opossum
+    username: alice
+
+- description: alice should have 60 clams now
+  method: GET
+  resource: users/alice
+  expect_rc: 200
+  expect_data: {"adopt_count": 0, "clams": 60, "glue_count": 0, "name": "alice", "spawn_count": 2}
+
+- description: same user and name, different species
+  method: POST
+  resource: critters?username=alice&species=turtle&name=oswald
+  expect_rc: 201
+  critter_dt: [66]
+  expect_data:
+    last_feed_time: "2020-01-01T01:06:00"
+    last_pet_time: "2020-01-01T01:06:00"
+    last_play_time: "2020-01-01T01:06:00"
+    name: oswald
+    spawn_time: "2020-01-01T01:06:00"
+    species: turtle
+    username: alice
+
+- description: alice should have 40 clams now
+  method: GET
+  resource: users/alice
+  expect_rc: 200
+  expect_data: {"adopt_count": 0, "clams": 40, "glue_count": 0, "name": "alice", "spawn_count": 3}
+
+- description: same user, name, and species
+  method: POST
+  resource: critters?username=alice&species=opossum&name=oscar
+  expect_rc: 409
+  critter_dt: [66]
+  expect_data: {"detail": "critter already exists: user=alice species=opossum name=oscar"}
+
+- description: create critter for user that does not exist
+  method: POST
+  resource: critters?username=mojojojo&species=fox&name=lulu
+  expect_rc: 404
+  expect_data: {"detail": "user not found: name=mojojojo"}
+
+- description: create critter for species that does not exist
+  method: POST
+  resource: critters?username=alice&species=moonworm&name=lulu
+  expect_rc: 404
+  critter_dt: [66]
+  expect_data: {"detail": "species not found: name=moonworm"}
+
+- description: alice should still have 40 clams
+  method: GET
+  resource: users/alice
+  expect_rc: 200
+  expect_data: {"adopt_count": 0, "clams": 40, "glue_count": 0, "name": "alice", "spawn_count": 3}
+
+- description: spawn an iguana for alice
+  method: POST
+  resource: critters?username=alice&species=iguana&name=larry
+  expect_rc: 201
+  critter_dt: [123]
+  expect_data:
+    last_feed_time: "2020-01-01T02:03:00"
+    last_pet_time: "2020-01-01T02:03:00"
+    last_play_time: "2020-01-01T02:03:00"
+    name: larry
+    spawn_time: "2020-01-01T02:03:00"
+    species: iguana
+    username: alice
+
+- description: alice should have 20 clams
+  method: GET
+  resource: users/alice
+  expect_rc: 200
+  expect_data: {"adopt_count": 0, "clams": 20, "glue_count": 0, "name": "alice", "spawn_count": 4}
+
+- description: spawn another iguana for alice
+  method: POST
+  resource: critters?username=alice&species=iguana&name=lucy
+  expect_rc: 201
+  critter_dt: [4000]
+  expect_data:
+    last_feed_time: "2020-01-03T18:40:00"
+    last_pet_time: "2020-01-03T18:40:00"
+    last_play_time: "2020-01-03T18:40:00"
+    name: lucy
+    spawn_time: "2020-01-03T18:40:00"
+    species: iguana
+    username: alice
+
+- description: alice should have 0 clams
+  method: GET
+  resource: users/alice
+  expect_rc: 200
+  expect_data: {"adopt_count": 0, "clams": 0, "glue_count": 0, "name": "alice", "spawn_count": 5}
+
+- description: try to spawn an iguana with no clams
+  method: POST
+  resource: critters?username=alice&species=iguana&name=leonardo
+  expect_rc: 400
+  critter_dt: [6000]
+  expect_data:  {"detail": "not enough clams to spawn a new critter"}
+
+- description: alice should still have 0 clams
+  method: GET
+  resource: users/alice
+  expect_rc: 200
+  expect_data: {"adopt_count": 0, "clams": 0, "glue_count": 0, "name": "alice", "spawn_count": 5}
