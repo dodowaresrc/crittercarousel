@@ -4,6 +4,6 @@ run-name: actor=${{github.actor}}
 on: pull_request
 jobs:
   job1:
-    runs-on: python:3.10-slim-bullseye
+    runs-on: ubuntu-latest
     steps:
-      - run: echo "go away"
+      - run: echo go away
